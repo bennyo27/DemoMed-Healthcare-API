@@ -1,6 +1,6 @@
 
 const axios = require('axios');
-const { calculateTotalRisk } = require('./riskScorer');
+const { analyzePatients } = require('./patientAnalyzer');
 
 // Wasn't sure if this should be here or in a config file for the assessment
 const API_KEY = 'ak_34a746a5e3373d42dff4d58b85a42a16f459d18fdea85a15';
@@ -54,9 +54,11 @@ async function main() {
   try {
     const allPatients = await getAllPatients();
 
-    allPatients.forEach(patient => {
-      const totalRisk = calculateTotalRisk(patient);
-    });
+    const { highRiskPatients, feverPatients, dataQualityIssues } = analyzePatients(allPatients);
+
+    console.log(highRiskPatients);
+    console.log(feverPatients);
+    console.log(dataQualityIssues);
 
   } catch (error) {
     console.error('Error: ', error.message);

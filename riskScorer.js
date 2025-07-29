@@ -1,21 +1,42 @@
 
-function calculateBloodPressureScore(patient) {
+
+function isInvalidBloodPressure(patient) {
   const bloodPressure = patient.blood_pressure;
   if (!bloodPressure || typeof bloodPressure !== 'string' || !bloodPressure.includes('/')) {
-    return 0;
+    return true;
   }
-
   const parts = bloodPressure.split('/');
-  if (parts.length !== 2) {
-    return 0;
+  if (parts.length !== 2 || parts[0] === '' || parts[1] === '') {
+    return true;
   }
-
   const systolic = parseInt(parts[0], 10);
   const diastolic = parseInt(parts[1], 10);
-
   if (isNaN(systolic) || isNaN(diastolic)) {
+    return true;
+  }
+  
+  return false;
+}
+
+function isInvalidTemperature(patient) {
+  const temp = patient.temperature;
+
+  return temp === null || temp === undefined || typeof temp === 'string' && temp.trim() === '' || isNaN(parseFloat(temp));
+}
+
+function isInvalidAge(patient) {
+  const age = patient.age;
+
+  return age === null || age === undefined || typeof age === 'string' && age.trim() === '' || isNaN(parseInt(age, 10));
+}
+
+function calculateBloodPressureScore(patient) {
+  if (isInvalidBloodPressure(patient)) {
     return 0;
   }
+  const parts = patient.blood_pressure.split('/');
+  const systolic = parseInt(parts[0], 10);
+  const diastolic = parseInt(parts[1], 10);
 
   if (systolic >= 140 || diastolic >= 90) {
     return 4;
@@ -34,37 +55,32 @@ function calculateBloodPressureScore(patient) {
 }
 
 function calculateTemperatureScore(patient) {
-  const temp = patient.temperature;
-  if (temp === null || temp === undefined || isNaN(parseFloat(temp))) {
+  if (isInvalidTemperature(patient)) {
     return 0;
   }
 
-  const tempValue = parseFloat(temp);
+  const tempValue = parseFloat(patient.temperature);
   if (tempValue >= 101.0) {
     return 2;
   }
   if (tempValue >= 99.6) {
     return 1;
   }
-  
+
   return 0;
 }
 
 function calculateAgeScore(patient) {
-  const age = patient.age;
-  if (age === null || age === undefined || isNaN(parseInt(age, 10))) {
+  if (isInvalidAge(patient)) {
     return 0;
   }
 
-  const ageValue = parseInt(age, 10);
+  const ageValue = parseInt(patient.age, 10);
   if (ageValue > 65) {
     return 2;
   }
-  if (ageValue >= 40 || ageValue < 40) {
-    return 1;
-  }
-  
-  return 0;
+
+  return 1;
 }
 
 function calculateTotalRisk(patient) {
@@ -76,7 +92,8 @@ function calculateTotalRisk(patient) {
 
 module.exports = {
   calculateTotalRisk,
-  calculateBloodPressureScore,
-  calculateTemperatureScore,
-  calculateAgeScore
+  isInvalidBloodPressure,
+  isInvalidTemperature,
+  isInvalidAge
 };
+

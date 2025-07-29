@@ -39,16 +39,16 @@ function calculateBloodPressureScore(patient) {
   const diastolic = parseInt(parts[1], 10);
 
   if (systolic >= 140 || diastolic >= 90) {
-    return 4;
-  }
-  if (systolic >= 130 || diastolic >= 80) {
     return 3;
   }
-  if (systolic >= 120 && diastolic < 80) {
+  if (systolic >= 130 || diastolic >= 80) {
     return 2;
   }
-  if (systolic < 120 && diastolic < 80) {
+  if (systolic >= 120 && diastolic < 80) {
     return 1;
+  }
+  if (systolic < 120 && diastolic < 80) {
+    return 0;
   }
 
   return 0;
@@ -74,13 +74,14 @@ function calculateAgeScore(patient) {
   if (isInvalidAge(patient)) {
     return 0;
   }
-
   const ageValue = parseInt(patient.age, 10);
   if (ageValue > 65) {
     return 2;
   }
-
-  return 1;
+  if (ageValue >= 40) {
+    return 1;
+  }
+  return 0;
 }
 
 function calculateTotalRisk(patient) {

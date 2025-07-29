@@ -1,6 +1,8 @@
 
 const axios = require('axios');
+const { calculateTotalRisk } = require('./riskScorer');
 
+// Wasn't sure if this should be here or in a config file for the assessment
 const API_KEY = 'ak_34a746a5e3373d42dff4d58b85a42a16f459d18fdea85a15';
 const BASE_URL = 'https://assessment.ksensetech.com/api';
 
@@ -36,7 +38,7 @@ async function getAllPatients() {
   let hasNext = true;
 
   while (hasNext) {
-    const data = await fetchWithRetry(`/patients?page=${page}`);
+    const data = await fetchWithRetry(`/patients?page=${page}&limit=20`);
     if (data && data.data) {
       allPatients = allPatients.concat(data.data);
       hasNext = data.pagination.hasNext;
@@ -51,6 +53,11 @@ async function getAllPatients() {
 async function main() {
   try {
     const allPatients = await getAllPatients();
+
+    allPatients.forEach(patient => {
+      const totalRisk = calculateTotalRisk(patient);
+    });
+
   } catch (error) {
     console.error('Error: ', error.message);
   }
